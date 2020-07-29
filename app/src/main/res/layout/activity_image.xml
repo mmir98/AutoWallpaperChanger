@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ImageActivity">
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/image_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </androidx.viewpager.widget.ViewPager>
+
+    <RelativeLayout
+        android:id="@+id/delete_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="@+id/set_as_wallpaper_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/set_as_wallpaper_button"
+        app:layout_constraintTop_toTopOf="@+id/set_as_wallpaper_button"
+        android:background="@drawable/round_icon_background"
+        android:elevation="2dp"
+        android:clickable="true"
+        android:focusable="true"
+        >
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_delete"
+            android:clickable="true"
+            android:focusable="true"/>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/set_as_wallpaper_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:text="Set As Wallpaper"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/rectangle_icon_background"
+        android:elevation="2dp"/>
+
+
+    <RelativeLayout
+        android:id="@+id/back_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/round_icon_background"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_back"
+            android:clickable="true"
+            android:focusable="true"/>
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

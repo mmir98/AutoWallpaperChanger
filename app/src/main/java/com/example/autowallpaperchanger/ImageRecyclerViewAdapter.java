@@ -15,13 +15,15 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
+public class ImageRecyclerViewAdapter extends RecyclerView.Adapter<ImageRecyclerViewAdapter.MyViewHolder> {
     private Context context;
-    private List<Uri> data;
+    private ImageData data;
+    private OnImageClickListener onImageClickListener;
 
-    MyAdapter(Context context, List<Uri> data){
+    ImageRecyclerViewAdapter(Context context, ImageData data, OnImageClickListener onImageClickListener){
         this.context = context;
         this.data = data;
+        this.onImageClickListener = onImageClickListener;
     }
 
     @NonNull
@@ -30,34 +32,48 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View view = layoutInflater.inflate(R.layout.recyclerview_item, parent, false);
 
-        return new MyViewHolder(view, context);
+        return new MyViewHolder(view, context, onImageClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 //        holder.imageView.setImageURI(data.get(position));
         Glide.with(context)
-                .load(data.get(position))
+                .load(data.getUriList().get(position))
                 .centerCrop()
                 .into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return data.getUriList().size();
     }
 
-    static class MyViewHolder extends RecyclerView.ViewHolder{
-        ImageView imageView;
-        DisplayMetrics displayMetrics = new DisplayMetrics();
 
-        public MyViewHolder(@NonNull View itemView, Context context) {
+    static class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        private ImageView imageView;
+        private DisplayMetrics displayMetrics = new DisplayMetrics();
+        private OnImageClickListener onImageClickListener;
+
+        public MyViewHolder(@NonNull View itemView, Context context, OnImageClickListener onImageClickListener) {
             super(itemView);
             imageView = itemView.findViewById(R.id.image_item);
             ((MainActivity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             imageView.getLayoutParams().width = displayMetrics.widthPixels / 3;
             imageView.getLayoutParams().height = displayMetrics.widthPixels / 3 * 16 / 9;
             imageView.requestLayout();
+
+            itemView.setOnClickListener(this);
+            this.onImageClickListener = onImageClickListener;
         }
+
+        @Override
+        public void onClick(View v) {
+            onImageClickListener.OnImageClicked(getAdapterPosition());
+        }
+    }
+
+    public interface OnImageClickListener{
+        void OnImageClicked(int position);
     }
 }
