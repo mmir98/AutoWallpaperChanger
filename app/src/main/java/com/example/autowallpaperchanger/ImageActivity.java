@@ -2,8 +2,16 @@ package com.example.autowallpaperchanger;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
+
+import android.app.WallpaperManager;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.widget.Toast;
+
+import java.io.IOException;
 
 
 public class ImageActivity extends AppCompatActivity implements View.OnClickListener {
@@ -60,8 +68,31 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
                 //todo implement delete action
             }
             case R.id.set_as_wallpaper_button:{
-                //todo implement set as wallpaper action
+                setWallpaperThread();
+                Toast.makeText(getApplicationContext(), "Wallpaper Changed", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void setWallpaperThread(){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), imageData.getUriList().get(viewPager.getCurrentItem()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+                try {
+                    wallpaperManager.setBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
     }
 }
