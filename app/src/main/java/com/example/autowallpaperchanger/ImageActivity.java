@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
 import android.app.WallpaperManager;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -81,6 +80,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
                 Bitmap bitmap = null;
                 try {
                     bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), imageData.getUriList().get(viewPager.getCurrentItem()));
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

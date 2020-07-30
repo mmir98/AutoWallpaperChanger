@@ -3,12 +3,6 @@ package com.example.autowallpaperchanger;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
-import android.widget.Toast;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +10,6 @@ public class ImageData implements Parcelable {
     private static final String TAG = "ImageData";
 
     public static final String URI_LIST = "URI_LIST";
-    public static final String FILE_NAME = "UriList";
 
     private List<Uri> uriList = new ArrayList<>();
 
@@ -25,20 +18,11 @@ public class ImageData implements Parcelable {
 
     }
 
-//    ImageData(String string){
-//        try {
-//            JSONObject jsonObject = new JSONObject(string);
-//            Object temp = jsonObject.get(URI_LIST);
-//            if (uriList.getClass() == temp.getClass()){
-//                uriList = ((List<Uri>) temp);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    ImageData(List<Uri> data){
-        uriList = data;
+    ImageData(List<String> data){
+        for (String uri :
+                data) {
+            uriList.add(Uri.parse(uri));
+        }
     }
 
     protected ImageData(Parcel in) {
@@ -83,14 +67,4 @@ public class ImageData implements Parcelable {
         dest.writeTypedList(uriList);
     }
 
-    public String createJsonFile(){
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(URI_LIST, uriList);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.d(TAG, "createJsonFile: JSON FAILED TO WRITE");
-        }
-        return jsonObject.toString();
-    }
 }
