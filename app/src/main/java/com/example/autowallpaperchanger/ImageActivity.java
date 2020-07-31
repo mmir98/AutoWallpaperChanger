@@ -3,6 +3,7 @@ package com.example.autowallpaperchanger;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.ProgressDialog;
 import android.app.WallpaperManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -15,6 +16,8 @@ import java.io.IOException;
 
 public class ImageActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "ImageActivity";
+
+    ProgressDialog pd;
 
     public static final String IMAGE_DATA = "IMAGE_DATA";
     public static final String IMAGE_POSITION = "IMAGE_POSITION";
@@ -32,6 +35,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_image);
 
         setupButtons();
+        pd = new ProgressDialog(ImageActivity.this);
 
 //        ClipData clipData = getIntent().getClipData();
 //        if (clipData != null) {
@@ -65,8 +69,12 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
             }
             case R.id.delete_button:{
                 //todo implement delete action
+                break;
             }
             case R.id.set_as_wallpaper_button:{
+
+                pd.setMessage("Loading to set wallpaper");
+                pd.show();
                 setWallpaperThread();
                 Toast.makeText(getApplicationContext(), "Wallpaper Changed", Toast.LENGTH_SHORT).show();
             }
@@ -84,13 +92,13 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
                 try {
                     wallpaperManager.setBitmap(bitmap);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                pd.cancel();
             }
         });
         thread.start();
