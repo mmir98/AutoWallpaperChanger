@@ -20,6 +20,8 @@ public class ImageData implements Parcelable {
     private List<Uri> uriList = new ArrayList<>();
     private int queueIndex = 0;
 
+    private static ImageData imageData = null;
+
 
     ImageData() {
 
@@ -30,6 +32,18 @@ public class ImageData implements Parcelable {
                 data) {
             uriList.add(Uri.parse(uri));
         }
+    }
+
+    public static ImageData getInstance()
+    {
+        if (imageData == null)
+            imageData = new ImageData();
+
+        return imageData;
+    }
+
+    public void setInstance(ImageData imageData){
+        this.imageData = imageData;
     }
 
     protected ImageData(Parcel in) {

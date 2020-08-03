@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
 //                }
             }
         }
+        imageData.setInstance(imageData);
     }
 
     private void saveImageData() {

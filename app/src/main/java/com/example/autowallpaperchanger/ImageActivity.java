@@ -6,6 +6,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.app.ProgressDialog;
 import android.app.WallpaperManager;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -43,10 +44,11 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
 //                imageUri.add(clipData.getItemAt(i).getUri());
 //            }
 //        }
+
         if (getIntent().hasExtra(IMAGE_POSITION))
             startPosition = getIntent().getIntExtra(IMAGE_POSITION, 0);
         if (getIntent().hasExtra(IMAGE_DATA))
-            imageData = getIntent().getParcelableExtra(IMAGE_DATA);
+            imageData = ImageData.getInstance();
 
         viewPager = findViewById(R.id.image_viewpager);
         imagePagerAdapter = new ImagePagerAdapter(this, imageData.getUriList());
