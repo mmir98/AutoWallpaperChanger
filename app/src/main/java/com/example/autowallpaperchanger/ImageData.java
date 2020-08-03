@@ -64,6 +64,10 @@ public class ImageData implements Parcelable {
         this.uriList.addAll(uriList);
     }
 
+    public void removeUri(int index){
+        uriList.remove(index);
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -82,7 +86,7 @@ public class ImageData implements Parcelable {
     }
 
     public Uri getNextUri() {
-        return uriList.get(queueIndex + 1);
+        return uriList.get((queueIndex + 1) % uriList.size());
     }
 
     public Uri getRandomUri() {
