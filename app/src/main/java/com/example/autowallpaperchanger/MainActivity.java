@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ClipData;
@@ -21,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.autowallpaperchanger.ImageActivity.IMAGE_DATA;
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         wallpaperRecyclerView = findViewById(R.id.wallpaperRecyclerView);
         wallpaperRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         wallpaperRecyclerView.setAdapter(adapter);
-
+        defineOnItemDragNDrop();
     }
 
     @Override
@@ -108,19 +110,42 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
 
 
     //Load & Save Image URIs As String Json/////////////////////////////////////////////////////////
-    private void loadImageData(){
+    private void loadImageData() {
         SharedPreferences sharedPreferences = getSharedPreferences(IMAGE_DATA, MODE_PRIVATE);
         String jsonString = sharedPreferences.getString(ImageData.URI_LIST, null);
         Gson gson = new Gson();
-        Type type = new TypeToken<List<String>>(){}.getType();
+        Type type = new TypeToken<List<String>>() {
+        }.getType();
         List<String> uris = gson.fromJson(jsonString, type);
-        if (uris != null)
-            imageData = new ImageData(uris);
-        else
-            imageData = new ImageData();
+        imageData = new ImageData();
+        if (uris != null) {
+//            ContentResolver contentResolver = getContentResolver();
+//            String[] projection = {MediaStore.MediaColumns.DATA};
+            for (String uriString :
+                    uris) {
+                Uri uri = Uri.parse(uriString);
+                imageData.addUri(uri);
+//                Cursor cursor = contentResolver.query(uri, projection, null, null, null);
+//                if (cursor != null && cursor.moveToFirst()){
+////                    imageData.addUri(uri);
+//
+//                    for (String string :
+//                            cursor.getColumnNames()) {
+//                        Log.d(TAG, "loadImageData: " + string + " ::: " + cursor.getString(cursor.getColumnIndex(string)));
+//                    }
+//                    cursor.close();
+////                    String path = cursor.getString(0);
+////                    Log.d(TAG, "loadImageData: " + path);
+////                    File file = new File(path);
+////                    if (file != null && file.exists()){
+////                        imageData.addUri(uri);
+////                    }
+//                }
+            }
+        }
     }
 
-    private void saveImageData(){
+    private void saveImageData() {
         SharedPreferences sharedPreferences = getSharedPreferences(IMAGE_DATA, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -134,4 +159,30 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         editor.apply();
     }
 
+    //Moving image items////////////////////////////////////////////////////////////////////////////
+    private void defineOnItemDragNDrop(){
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.DOWN | ItemTouchHelper.UP
+                | ItemTouchHelper.START | ItemTouchHelper.END);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                int from = viewHolder.getAdapterPosition();
+                int to = target.getAdapterPosition() >= adapter.getItemCount() ? adapter.getItemCount() - 1: target.getAdapterPosition();
+                Collections.swap(imageData.getUriList(), from, to);
+                adapter.notifyItemMoved(from, to);
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(wallpaperRecyclerView);
+    }
 }
