@@ -20,7 +20,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
 
     ProgressDialog pd;
 
-    public static final String IMAGE_DATA = "IMAGE_DATA";
+//    public static final String IMAGE_DATA = "IMAGE_DATA";
     public static final String IMAGE_POSITION = "IMAGE_POSITION";
 
     private ViewPager viewPager;
@@ -78,6 +78,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
                 pd.setMessage("Loading to set wallpaper");
                 pd.show();
                 setWallpaperThread();
+                //todo equalize imageData queue pointer
                 Toast.makeText(getApplicationContext(), "Wallpaper Changed", Toast.LENGTH_SHORT).show();
             }
         }

@@ -10,15 +10,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ClipData;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.provider.MediaStore;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,15 +24,11 @@ import android.view.MenuItem;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.autowallpaperchanger.ImageActivity.IMAGE_DATA;
 import static com.example.autowallpaperchanger.ImageActivity.IMAGE_POSITION;
 
 public class MainActivity extends AppCompatActivity implements ImageRecyclerViewAdapter.OnImageClickListener {
@@ -123,11 +117,10 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
 
     //Load & Save Image URIs As String Json/////////////////////////////////////////////////////////
     private void loadImageData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(IMAGE_DATA, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(ImageData.IMAGE_DATA, MODE_PRIVATE);
         String jsonString = sharedPreferences.getString(ImageData.URI_LIST, null);
         Gson gson = new Gson();
-        Type type = new TypeToken<List<String>>() {
-        }.getType();
+        Type type = new TypeToken<List<String>>() {}.getType();
         List<String> uris = gson.fromJson(jsonString, type);
         imageData = ImageData.getInstance();
         ArrayList<Uri> uriList = new ArrayList<>();
@@ -142,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
     }
 
     private void saveImageData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(IMAGE_DATA, MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(ImageData.IMAGE_DATA, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         List<String> uris = new ArrayList<>();
@@ -152,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         }
         String jsonString = gson.toJson(uris);
         editor.putString(ImageData.URI_LIST, jsonString);
+        editor.putInt(ImageData.CURRENT_URI, imageData.getQueueIndex());
         editor.apply();
     }
 
@@ -188,9 +182,9 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         Log.d(TAG, "setAlarmManager: setting Alarm");
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlertReceiver.class);
-        intent.putExtra(AlertReceiver.URI, imageData.getCurrentUri().toString());
-        intent.putExtra("test", "this is for test!!!");
-        intent.putExtra(AlertReceiver.IS_SHUFFLE, isShuffle);
+//        intent.putExtra(AlertReceiver.URI, imageData.getCurrentUri().toString());
+//        intent.putExtra("test", "this is for test!!!");
+//        intent.putExtra(AlertReceiver.IS_SHUFFLE, isShuffle);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         if (alarmManager != null && pendingIntent != null) {
             Log.d(TAG, "setAlarmManager: Alarm SET :: " + SystemClock.elapsedRealtime() + timeInterval);
