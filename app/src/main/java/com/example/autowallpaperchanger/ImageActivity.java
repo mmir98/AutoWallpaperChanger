@@ -37,18 +37,18 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
 
         setupButtons();
         pd = new ProgressDialog(ImageActivity.this);
-
+        imageData = ImageData.getInstance();
 //        ClipData clipData = getIntent().getClipData();
 //        if (clipData != null) {
 //            for (int i = 0; i < clipData.getItemCount(); i++) {
 //                imageUri.add(clipData.getItemAt(i).getUri());
 //            }
 //        }
-
+//
         if (getIntent().hasExtra(IMAGE_POSITION))
             startPosition = getIntent().getIntExtra(IMAGE_POSITION, 0);
-        if (getIntent().hasExtra(IMAGE_DATA))
-            imageData = ImageData.getInstance();
+//        if (getIntent().hasExtra(IMAGE_DATA))
+//            imageData = ImageData.getInstance();
 
         viewPager = findViewById(R.id.image_viewpager);
         imagePagerAdapter = new ImagePagerAdapter(this, imageData.getUriList());
@@ -89,7 +89,8 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
             public void run() {
                 Bitmap bitmap = null;
                 try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), imageData.getUriList().get(viewPager.getCurrentItem()));
+                    bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver()
+                            ,imageData.getUriList().get(viewPager.getCurrentItem()));
 
                 } catch (IOException e) {
                     e.printStackTrace();

@@ -7,11 +7,18 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ClipData;
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +27,8 @@ import android.view.MenuItem;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,6 +45,9 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
     private RecyclerView wallpaperRecyclerView;
     private ImageRecyclerViewAdapter adapter;
     private ImageData imageData;
+
+    private int timeInterval = 1000 * 15;
+    private boolean isShuffle = true;
 
 
     @Override
@@ -69,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
                 for (int i = 0; i < clipData.getItemCount(); i++) {
                     imageData.addUri(clipData.getItemAt(i).getUri());
                     adapter.notifyDataSetChanged();
-//                    getContentResolver().takePersistableUriPermission(clipData.getItemAt(i).getUri() , Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
             }
         }
@@ -80,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         Intent intent = new Intent(this, ImageActivity.class);
         intent.putExtra(IMAGE_POSITION, position);
 //        intent.setClipData(imageClipData);
-        intent.putExtra(IMAGE_DATA, imageData);
+//        intent.putExtra(IMAGE_DATA, imageData);
         startActivity(intent);
     }
 
@@ -104,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
                 return true;
             case R.id.setting:
                 //todo go to settings
+                setAlarmManager();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -117,33 +129,16 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         Type type = new TypeToken<List<String>>() {
         }.getType();
         List<String> uris = gson.fromJson(jsonString, type);
-        imageData = new ImageData();
+        imageData = ImageData.getInstance();
+        ArrayList<Uri> uriList = new ArrayList<>();
         if (uris != null) {
-//            ContentResolver contentResolver = getContentResolver();
-//            String[] projection = {MediaStore.MediaColumns.DATA};
             for (String uriString :
                     uris) {
                 Uri uri = Uri.parse(uriString);
-                imageData.addUri(uri);
-//                Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-//                if (cursor != null && cursor.moveToFirst()){
-////                    imageData.addUri(uri);
-//
-//                    for (String string :
-//                            cursor.getColumnNames()) {
-//                        Log.d(TAG, "loadImageData: " + string + " ::: " + cursor.getString(cursor.getColumnIndex(string)));
-//                    }
-//                    cursor.close();
-////                    String path = cursor.getString(0);
-////                    Log.d(TAG, "loadImageData: " + path);
-////                    File file = new File(path);
-////                    if (file != null && file.exists()){
-////                        imageData.addUri(uri);
-////                    }
-//                }
+                uriList.add(uri);
             }
         }
-        imageData.setInstance(imageData);
+        imageData.setUriList(uriList);
     }
 
     private void saveImageData() {
@@ -161,18 +156,18 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
     }
 
     //Moving image items////////////////////////////////////////////////////////////////////////////
-    private void defineOnItemDragNDrop(){
+    private void defineOnItemDragNDrop() {
         ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.DOWN | ItemTouchHelper.UP
-                | ItemTouchHelper.START | ItemTouchHelper.END);
+                        | ItemTouchHelper.START | ItemTouchHelper.END);
             }
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 int from = viewHolder.getAdapterPosition();
-                int to = target.getAdapterPosition() >= adapter.getItemCount() ? adapter.getItemCount() - 1: target.getAdapterPosition();
+                int to = target.getAdapterPosition() >= adapter.getItemCount() ? adapter.getItemCount() - 1 : target.getAdapterPosition();
                 Collections.swap(imageData.getUriList(), from, to);
                 adapter.notifyItemMoved(from, to);
                 return true;
@@ -185,5 +180,22 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(wallpaperRecyclerView);
+    }
+
+
+    // Enabling the Alarm Manager for Changing wallpapers //////////////////////////////////////////
+    private void setAlarmManager() {
+        Log.d(TAG, "setAlarmManager: setting Alarm");
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        intent.putExtra(AlertReceiver.URI, imageData.getCurrentUri().toString());
+        intent.putExtra("test", "this is for test!!!");
+        intent.putExtra(AlertReceiver.IS_SHUFFLE, isShuffle);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (alarmManager != null && pendingIntent != null) {
+            Log.d(TAG, "setAlarmManager: Alarm SET :: " + SystemClock.elapsedRealtime() + timeInterval);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
+                    SystemClock.elapsedRealtime() + timeInterval, timeInterval, pendingIntent);
+        }
     }
 }

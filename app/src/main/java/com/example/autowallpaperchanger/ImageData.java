@@ -1,37 +1,24 @@
 package com.example.autowallpaperchanger;
 
 import android.net.Uri;
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-public class ImageData implements Parcelable {
+
+public class ImageData {
     private static final String TAG = "ImageData";
 
     public static final String URI_LIST = "URI_LIST";
 
     private List<Uri> uriList = new ArrayList<>();
-    private int queueIndex = 0;
+    private int queueIndex;
 
     private static ImageData imageData = null;
 
 
-    ImageData() {
+    private ImageData() {
 
-    }
-
-    ImageData(List<String> data) {
-        for (String uri :
-                data) {
-            uriList.add(Uri.parse(uri));
-        }
     }
 
     public static ImageData getInstance()
@@ -41,26 +28,6 @@ public class ImageData implements Parcelable {
 
         return imageData;
     }
-
-    public void setInstance(ImageData imageData){
-        this.imageData = imageData;
-    }
-
-    protected ImageData(Parcel in) {
-        uriList = in.createTypedArrayList(Uri.CREATOR);
-    }
-
-    public static final Creator<ImageData> CREATOR = new Creator<ImageData>() {
-        @Override
-        public ImageData createFromParcel(Parcel in) {
-            return new ImageData(in);
-        }
-
-        @Override
-        public ImageData[] newArray(int size) {
-            return new ImageData[size];
-        }
-    };
 
     public List<Uri> getUriList() {
         return uriList;
@@ -82,18 +49,9 @@ public class ImageData implements Parcelable {
         uriList.remove(index);
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(uriList);
-    }
 
     //Queue methods ////////////////////////////////////////////////////////////////////////////////
-    public Uri getCurrentUri() {
+    public Uri getCurrentUri() {  // Dequeue from uriList
         Uri uri = uriList.get(queueIndex);
         queueIndex = (queueIndex + 1) % uriList.size();
         return uri;
@@ -110,6 +68,5 @@ public class ImageData implements Parcelable {
         Collections.shuffle(random);
         return random.get(0);
     }
-
 
 }
