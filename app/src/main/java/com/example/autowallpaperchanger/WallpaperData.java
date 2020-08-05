@@ -20,8 +20,8 @@ import java.util.List;
 class WallpaperData {
     private static final String TAG = "AlertReceiver";
 
-    public static final String URI = "URI";
-    public static final String IS_SHUFFLE = "SHUFFLE_STATUS";
+//    public static final String URI = "URI";
+//    public static final String IS_SHUFFLE = "SHUFFLE_STATUS";
 
     private ImageData imageData;
     private Uri uri;

@@ -1,0 +1,20 @@
+<resources>
+    <!-- Time Interval Preference -->
+    <string-array name="time_interval_entries">
+        <item>5 Min</item>
+        <item>10 Min</item>
+        <item>30 Min</item>
+        <item>1 Hour</item>
+        <item>5 Hour</item>
+        <item>24 Hour</item>
+    </string-array>
+
+    <string-array name="time_interval_values">
+        <item>1000*60*5</item>
+        <item>1000*60*10</item>
+        <item>1000*60*30</item>
+        <item>1000*60*60*1</item>
+        <item>1000*60*60*5</item>
+        <item>1000*60*60*24</item>
+    </string-array>
+</resources>

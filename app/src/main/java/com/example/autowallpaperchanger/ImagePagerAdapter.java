@@ -2,6 +2,7 @@ package com.example.autowallpaperchanger;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -12,6 +13,8 @@ import androidx.viewpager.widget.PagerAdapter;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class ImagePagerAdapter extends PagerAdapter {
     private Context context;
@@ -49,5 +52,15 @@ public class ImagePagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         container.removeView(((ImageView) object));
+    }
+
+    @Override
+    public int getItemPosition(@NonNull Object object) {
+        return PagerAdapter.POSITION_NONE;
+    }
+
+    public void removeItem(int position){
+        imageUri.remove(position);
+        notifyDataSetChanged();
     }
 }

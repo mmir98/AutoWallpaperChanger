@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
     private ImageRecyclerViewAdapter adapter;
     private ImageData imageData;
 
-    private int timeInterval = 1000 * 15;
+    SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
     private boolean isShuffle = true;
 
 
@@ -57,12 +58,30 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
         wallpaperRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         wallpaperRecyclerView.setAdapter(adapter);
         defineOnItemDragNDrop();
+
+        initializePrefChangeListener();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume: Called.");
+        adapter.notifyDataSetChanged();
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+        super.onResume();
     }
 
     @Override
     protected void onStop() {
+        Log.d(TAG, "onStop: called.");
         super.onStop();
         saveImageData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "onDestroy: called.");
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+        super.onDestroy();
     }
 
     @Override
@@ -108,8 +127,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
                 startActivityForResult(Intent.createChooser(intent, "Choose Photos."), REQUEST_PICK_FROM_GALLERY);
                 return true;
             case R.id.setting:
-                //todo go to settings
-                setAlarmManager();
+                startActivity(SettingsActivity.getSettingIntent(this));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -178,18 +196,82 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
 
 
     // Enabling the Alarm Manager for Changing wallpapers //////////////////////////////////////////
-    private void setAlarmManager() {
+    private void setAlarmManager(long time) {
         Log.d(TAG, "setAlarmManager: setting Alarm");
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlertReceiver.class);
-//        intent.putExtra(AlertReceiver.URI, imageData.getCurrentUri().toString());
-//        intent.putExtra("test", "this is for test!!!");
-//        intent.putExtra(AlertReceiver.IS_SHUFFLE, isShuffle);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         if (alarmManager != null && pendingIntent != null) {
-            Log.d(TAG, "setAlarmManager: Alarm SET :: " + SystemClock.elapsedRealtime() + timeInterval);
-            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
-                    SystemClock.elapsedRealtime() + timeInterval, timeInterval, pendingIntent);
+            Log.d(TAG, "setAlarmManager: Alarm SET :: " + SystemClock.elapsedRealtime());
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), time, pendingIntent);
         }
     }
+
+    private void cancelAlarm(){
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(this, AlertReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (alarmManager != null && pendingIntent != null) {
+            alarmManager.cancel(pendingIntent);
+        }
+    }
+
+
+    private void initializePrefChangeListener(){
+        preferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                Log.d(TAG, "onSharedPreferenceChanged: changed :: " + key);
+                if (key.equals("feature_status")){
+                    Log.d(TAG, "onSharedPreferenceChanged: " + sharedPreferences.getBoolean(key, false));
+                    if (sharedPreferences.getBoolean(key, false)){
+                        String prefTimeString = sharedPreferences.getString("time_interval", "1000*60*30");
+                        long time = parseTime(prefTimeString);
+                        setAlarmManager(time);
+                    }
+                    else{
+                        cancelAlarm();
+                    }
+                }
+                else if (key.equals("time_interval")){
+                    Log.d(TAG, "onSharedPreferenceChanged: " + sharedPreferences.getString(key, String.valueOf(1000*60*30)));
+                    String preferencesTimeString = sharedPreferences.getString(key, String.valueOf(1000*60*30));
+                    long time = parseTime(preferencesTimeString);
+                    setAlarmManager(time);
+                }
+            }
+
+            private long parseTime(String prefTimeString){
+                long time = 1000 * 60 * 30;
+                switch(prefTimeString){
+                    case "1000*60*5":{
+                        time = 1000 * 60 * 5;
+                        break;
+                    }
+                    case "1000*60*10":{
+                        time = 1000 * 60 * 10;
+                        break;
+                    }
+                    case "1000*60*30": {
+                        time = 1000 * 60 * 30;
+                        break;
+                    }
+                    case "1000*60*60*1":{
+                        time = 1000 * 60 * 60;
+                        break;
+                    }
+                    case "1000*60*60*5":{
+                        time = 1000 * 60 * 60 * 5;
+                        break;
+                    }
+                    case "1000*60*60*24":{
+                        time = 1000 * 60 * 60 * 24;
+                        break;
+                    }
+                }
+                return time;
+            }
+        };
+    }
+
 }

@@ -1,9 +1,11 @@
 package com.example.autowallpaperchanger;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -11,8 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-
-import java.util.List;
 
 
 public class ImageRecyclerViewAdapter extends RecyclerView.Adapter<ImageRecyclerViewAdapter.MyViewHolder> {
@@ -75,5 +75,54 @@ public class ImageRecyclerViewAdapter extends RecyclerView.Adapter<ImageRecycler
 
     public interface OnImageClickListener{
         void OnImageClicked(int position);
+    }
+
+
+    static class RecyclerViewOnItemClickedListener implements RecyclerView.OnItemTouchListener{
+        private GestureDetector gestureDetector;
+        private ItemClickListener clickListener;
+
+        RecyclerViewOnItemClickedListener(Context context, final RecyclerView recyclerView, final ItemClickListener clickListener){
+            this.clickListener = clickListener;
+            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
+                    if(child != null && clickListener != null){
+                        clickListener.OnLongClicked(child, recyclerView.getChildLayoutPosition(child));
+                    }
+                }
+            });
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+            View child = rv.findChildViewUnder(e.getX(), e.getY());
+            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)){
+                clickListener.OnClicked(child, rv.getChildLayoutPosition(child));
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+
+        }
+
+        @Override
+        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+        }
+    }
+
+    public interface ItemClickListener {
+        void OnClicked(View view, int position);
+
+        void OnLongClicked(View view, int position);
     }
 }

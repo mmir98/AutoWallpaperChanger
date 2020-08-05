@@ -2,4 +2,24 @@
     <string name="app_name">AutoWallpaperChanger</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="about_us_header">About us</string>
+    <string name="general_settings_header">General Settings</string>
+
+    <!-- About us Preferences -->
+    <string name="about_us_summary">This project is designed to change wallpaper of your device automatically in the selected time interval.\n
+    It is for Mobile Programming course at sharif university of technology.\n\n
+        Brought to you by Roshanz team\n
+    All rights reserved.</string>
+
+    <!-- General settings Preferences -->
+    <string name="feature_status_title">Enable Feature</string>
+
+    <string name="shuffle_title">Shuffle</string>
+    <string name="shuffle_summary_on">Images will be shuffled before setting as wallpaper.</string>
+    <string name="shuffle_summary_off">Images won\'t be shuffled.</string>
+
+    <string name="time_interval_title">Time Interval</string>
 </resources>
