@@ -8,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
@@ -20,10 +21,13 @@ import androidx.annotation.RequiresApi;
 
 import java.io.IOException;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * Implementation of App Widget functionality.
  */
 public class wallpaperWidget extends AppWidgetProvider {
+    private static final String TAG = "WidgetReceiver";
 
     private String strPower = "Power";
     private String strNext = "Next";
@@ -31,23 +35,22 @@ public class wallpaperWidget extends AppWidgetProvider {
     private String strTime = "Time";
     private String strGallery = "Gallery";
 
+    private Drawable times[] = new Drawable[6];
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         ComponentName thisWidget = new ComponentName(context, wallpaperWidget.class);
         int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.wallpaper_widget);
+
+        remoteViews.setOnClickPendingIntent(R.id.power_button, getPendingSelfIntent(context, strPower));
+        remoteViews.setOnClickPendingIntent(R.id.next_button, getPendingSelfIntent(context, strNext));
+        remoteViews.setOnClickPendingIntent(R.id.time_button, getPendingSelfIntent(context, strTime));
+        remoteViews.setOnClickPendingIntent(R.id.shuffle_button, getPendingSelfIntent(context, strShuffle));
+        remoteViews.setOnClickPendingIntent(R.id.gallery_button, getPendingSelfIntent(context, strGallery));
+
         for (int widgetId : allWidgetIds) {
-
-            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.wallpaper_widget);
-
-            remoteViews.setOnClickPendingIntent(R.id.power_button, getPendingSelfIntent(context, strPower));
-            remoteViews.setOnClickPendingIntent(R.id.next_button, getPendingSelfIntent(context, strNext));
-            remoteViews.setOnClickPendingIntent(R.id.time_button, getPendingSelfIntent(context, strTime));
-            remoteViews.setOnClickPendingIntent(R.id.shuffle_button, getPendingSelfIntent(context, strShuffle));
-            remoteViews.setOnClickPendingIntent(R.id.gallery_button, getPendingSelfIntent(context, strGallery));
-
-//            remoteViews.setTextViewText(R.id.widget_textview_gpscoords, "gps cords");
-
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
         }
     }
@@ -74,13 +77,23 @@ public class wallpaperWidget extends AppWidgetProvider {
         } else if (strNext.equals(intent.getAction())) {
             Toast.makeText(context, "next", Toast.LENGTH_SHORT).show();
             Log.w("Widget", "Clicked button2");
-            setNextWallpaperThread(context);
+            WallpaperData wallpaperData = new WallpaperData();
+            wallpaperData.loadData(context);
+            Log.d(TAG, "onReceive: " + wallpaperData.getImageData().getUriList().size());
+            if (wallpaperData.getImageData() != null && wallpaperData.getUri() != null) {
+                wallpaperData.changeWallpaper(context);
+                wallpaperData.saveData(context);
+            }
         } else if (strTime.equals(intent.getAction())) {
             Toast.makeText(context, "time", Toast.LENGTH_SHORT).show();
             Log.w("Widget", "Clicked button3");
-//            remoteViews.setImageViewResource(R.id.time_button, R.drawable.ic_widget_10m);
-//            appWidgetManager.updateAppWidget(R.id.time_button, remoteViews);
-//            remoteViews.setInt(R.id.time_button, "setBackgroundResource", R.drawable.ic_widget_10m);
+            remoteViews.setImageViewResource(R.id.time_button, R.drawable.ic_widget_10m);
+
+            ComponentName thisAppWidget = new ComponentName(context.getPackageName(), getClass().getName());
+            int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
+            for (int appWidgetID: ids) {
+                appWidgetManager.updateAppWidget(appWidgetID, remoteViews);
+            }
         } else if (strShuffle.equals(intent.getAction())) {
             Toast.makeText(context, "shuffle", Toast.LENGTH_SHORT).show();
             Log.w("Widget", "Clicked button4");
@@ -101,28 +114,6 @@ public class wallpaperWidget extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
-    }
-
-    private void setNextWallpaperThread(final Context context){
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Bitmap bitmap = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), ImageData.getInstance().getNextUri());
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
-                try {
-                    wallpaperManager.setBitmap(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        thread.start();
     }
 }
 
