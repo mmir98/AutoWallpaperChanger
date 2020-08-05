@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -15,6 +16,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 class WallpaperData {
@@ -33,22 +37,38 @@ class WallpaperData {
         SharedPreferences sharedPreferences = context.getSharedPreferences(ImageData.IMAGE_DATA, Context.MODE_PRIVATE);
         String jsonString = sharedPreferences.getString(ImageData.URI_LIST, null);
         position = sharedPreferences.getInt(ImageData.CURRENT_URI, 0);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        shuffle = preferences.getBoolean("shuffle", false);
+        Log.d(TAG, "loadData: shuffle :: " + shuffle);
+
         Gson gson = new Gson();
-        Type type = new TypeToken<List<String>>() {}.getType();
+        Type type = new TypeToken<List<String>>() {
+        }.getType();
         List<String> uris = gson.fromJson(jsonString, type);
         imageData = ImageData.getInstance();
         imageData.setQueueIndex(position);
         if (uris != null) {
-            listSize = uris.size();
-            this.uri = Uri.parse(uris.get(position));
+            if (shuffle) {
+                ArrayList<String> uriArrayList = new ArrayList<>(uris);
+                uriArrayList.remove(position);
+                uriArrayList.remove(position + 1);
+                Collections.shuffle(uriArrayList);
+                uri = Uri.parse(uriArrayList.get(0));
+            } else {
+                listSize = uris.size();
+                this.uri = Uri.parse(uris.get(position));
+            }
         }
     }
 
-    public void saveData(Context context){
-        SharedPreferences sharedPreferences = context.getSharedPreferences(ImageData.IMAGE_DATA, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(ImageData.CURRENT_URI, (imageData.getQueueIndex() + 1) % listSize);
-        editor.apply();
+    public void saveData(Context context) {
+        if (!shuffle) {
+            SharedPreferences sharedPreferences = context.getSharedPreferences(ImageData.IMAGE_DATA, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putInt(ImageData.CURRENT_URI, (imageData.getQueueIndex() + 1) % listSize);
+            editor.apply();
+        }
     }
 
     public void changeWallpaper(final Context context) {
@@ -64,7 +84,7 @@ class WallpaperData {
                     WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
-                    }else{
+                    } else {
                         wallpaperManager.setBitmap(bitmap);
                     }
                     Log.d(TAG, "run: wallpaper Changed.");
