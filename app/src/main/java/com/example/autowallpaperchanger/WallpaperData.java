@@ -42,6 +42,7 @@ class WallpaperData {
         shuffle = preferences.getBoolean("shuffle", false);
         Log.d(TAG, "loadData: shuffle :: " + shuffle);
 
+
         Gson gson = new Gson();
         Type type = new TypeToken<List<String>>() {
         }.getType();

@@ -51,18 +51,26 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
 
     private void setupButtons() {
         findViewById(R.id.back_button).setOnClickListener(this);
+        findViewById(R.id.back_icon).setOnClickListener(this);
         findViewById(R.id.delete_button).setOnClickListener(this);
+        findViewById(R.id.delete_icon).setOnClickListener(this);
         findViewById(R.id.set_as_wallpaper_button).setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.back_button: {
+            case R.id.back_icon: {
+                Log.d(TAG, "onClick: back");
                 onBackPressed();
                 break;
             }
-            case R.id.delete_button: {
+            case R.id.back_button:{
+                onBackPressed();
+                break;
+            }
+            case R.id.delete_button | R.id.delete_icon: {
+                Log.d(TAG, "onClick: delete");
                 deleteImage();
                 break;
             }
@@ -70,7 +78,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
                 pd.setMessage("Loading to set wallpaper");
                 pd.show();
                 setWallpaperThread();
-                //todo equalize imageData queue pointer
+                equalizeQueuePointer();
                 Toast.makeText(getApplicationContext(), "Wallpaper Changed", Toast.LENGTH_SHORT).show();
             }
         }
@@ -97,6 +105,10 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
             }
         });
         thread.start();
+    }
+
+    private void equalizeQueuePointer(){
+        imageData.setQueueIndex(viewPager.getCurrentItem());
     }
 
     private void deleteImage() {
