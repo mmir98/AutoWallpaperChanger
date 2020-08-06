@@ -51,8 +51,8 @@ class WallpaperData {
         if (uris != null) {
             if (shuffle) {
                 ArrayList<String> uriArrayList = new ArrayList<>(uris);
-                uriArrayList.remove(position);
-                uriArrayList.remove(position + 1);
+                int index = position - 1 < 0 ? uris.size() - 1 : position - 1;
+                uriArrayList.remove(index);
                 Collections.shuffle(uriArrayList);
                 uri = Uri.parse(uriArrayList.get(0));
             } else {
