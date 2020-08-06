@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#001a66</color>
     <color name="colorAccent">#001247</color>
     <color name="tr_gray">#80bdcdff</color>
-    <color name="active_green">#49AE43</color>
-    <color name="black">#000</color>
+    <color name="active_green">#809fff</color>
+    <color name="black">#001247</color>
 </resources>

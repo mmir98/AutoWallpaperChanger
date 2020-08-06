@@ -56,15 +56,7 @@ class WallpaperData {
             listSize = uris.size();
             if (shuffle) {
                 position = getRandomIndex(listSize);
-//                ArrayList<String> uriArrayList = new ArrayList<>(uris);
-//                int index = position - 1 < 0 ? uris.size() - 1 : position - 1;
-//                uriArrayList.remove(index);
-//                Collections.shuffle(uriArrayList);
-//                uri = Uri.parse(uriArrayList.get(0));
             }
-//             else {
-//                this.uri = Uri.parse(uris.get(position));
-//            }
             this.uri = Uri.parse(uris.get(position));
         }
         imageData.setQueueIndex(position);

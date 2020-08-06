@@ -2,7 +2,6 @@ package com.example.autowallpaperchanger;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,8 +12,6 @@ import androidx.viewpager.widget.PagerAdapter;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 public class ImagePagerAdapter extends PagerAdapter {
     private Context context;

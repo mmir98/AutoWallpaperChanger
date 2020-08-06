@@ -2,7 +2,6 @@ package com.example.autowallpaperchanger;
 
 import android.net.Uri;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -58,23 +57,5 @@ public class ImageData {
         this.queueIndex = queueIndex;
     }
 
-    //Queue methods ////////////////////////////////////////////////////////////////////////////////
-    public Uri getCurrentUri() {  // Dequeue from uriList
-        Uri uri = uriList.get(queueIndex);
-        queueIndex = (queueIndex + 1) % uriList.size();
-        return uri;
-    }
-
-    public Uri getNextUri() {
-        return uriList.get((queueIndex + 1) % uriList.size());
-    }
-
-    public Uri getRandomUri() {
-        ArrayList<Uri> random = new ArrayList<>(uriList);
-        random.remove(queueIndex);
-        random.remove(queueIndex + 1);
-        Collections.shuffle(random);
-        return random.get(0);
-    }
 
 }
