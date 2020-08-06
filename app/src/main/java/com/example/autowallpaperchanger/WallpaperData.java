@@ -28,8 +28,6 @@ import java.util.Random;
 class WallpaperData {
     private static final String TAG = "AlertReceiver";
 
-    //    public static final String URI = "URI";
-//    public static final String IS_SHUFFLE = "SHUFFLE_STATUS";
     public static final String LAST_RANDOM = "last_random";
 
     private ImageData imageData;
