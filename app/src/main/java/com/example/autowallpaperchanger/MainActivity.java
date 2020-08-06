@@ -223,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 Log.d(TAG, "onSharedPreferenceChanged: changed :: " + key);
                 if (key.equals("feature_status")){
+                    BigWallpaperWidget.enableAndDisableChangeSync(getApplicationContext());
                     Log.d(TAG, "onSharedPreferenceChanged: " + sharedPreferences.getBoolean(key, false));
                     if (sharedPreferences.getBoolean(key, false)){
                         String prefTimeString = sharedPreferences.getString("time_interval", "1000*60*30");
@@ -234,10 +235,14 @@ public class MainActivity extends AppCompatActivity implements ImageRecyclerView
                     }
                 }
                 else if (key.equals("time_interval")){
+                    BigWallpaperWidget.timeChangeSync(getApplicationContext());
                     Log.d(TAG, "onSharedPreferenceChanged: " + sharedPreferences.getString(key, String.valueOf(1000*60*30)));
                     String preferencesTimeString = sharedPreferences.getString(key, String.valueOf(1000*60*30));
                     long time = parseTime(preferencesTimeString);
                     setAlarmManager(time);
+                }
+                else if (key.equals("shuffle")){
+                    BigWallpaperWidget.shuffleChangeSync(getApplicationContext());
                 }
             }
 

@@ -34,13 +34,16 @@ public class BigWallpaperWidget extends AppWidgetProvider {
     private static boolean enableState = FALSE;
     private static boolean shuffleState = FALSE;
     private static String timeState = "5m";
-    private String[] stringTimes = {"5m", "10m", "30m", "1h", "5h", "24h"};
-    private int[] times = {R.drawable.ic_widget_5m,
+    private static String[] stringTimes = {"5m", "10m", "30m", "1h", "5h", "24h"};
+    private static int[] times = {R.drawable.ic_widget_5m,
             R.drawable.ic_widget_10m,
             R.drawable.ic_widget_30m,
             R.drawable.ic_widget_1h,
             R.drawable.ic_widget_5h,
             R.drawable.ic_widget_24h};
+
+
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
@@ -55,6 +58,9 @@ public class BigWallpaperWidget extends AppWidgetProvider {
         remoteViews.setOnClickPendingIntent(R.id.time_button, getPendingSelfIntent(context, strTime));
         remoteViews.setOnClickPendingIntent(R.id.shuffle_button, getPendingSelfIntent(context, strShuffle));
         remoteViews.setOnClickPendingIntent(R.id.gallery_button, getPendingSelfIntent(context, strGallery));
+        timeChangeSync(context);
+        enableAndDisableChangeSync(context);
+        shuffleChangeSync(context);
 
         for (int widgetId : allWidgetIds) {
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
@@ -74,11 +80,11 @@ public class BigWallpaperWidget extends AppWidgetProvider {
         super.onReceive(context, intent);
 
         if (strPower.equals(intent.getAction())) {
-            enableAndDisable(context);
+            enableAndDisableChange(context);
         } else if (strNext.equals(intent.getAction())) {
             nextWallpaper(context);
         } else if (strTime.equals(intent.getAction())) {
-            changeTime(context);
+            timeChange(context);
         } else if (strShuffle.equals(intent.getAction())) {
             shuffleChange(context);
         } else if (strGallery.equals(intent.getAction())) {
@@ -107,7 +113,7 @@ public class BigWallpaperWidget extends AppWidgetProvider {
         }
     }
 
-    private void changeTime(Context context){
+    private void timeChange(Context context){
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.big_wallpaper_widget);
 
@@ -131,7 +137,30 @@ public class BigWallpaperWidget extends AppWidgetProvider {
         }
     }
 
-    private void enableAndDisable(Context context){
+    public static void timeChangeSync(Context context){
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.big_wallpaper_widget);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String state = sharedPreferences.getString("time_interval", context.getResources().getStringArray(R.array.time_interval_values)[2]);
+
+        for (int i = 0 ; i < 6 ; i++) {
+            if (state.equals(context.getResources().getStringArray(R.array.time_interval_values)[i])) {
+                timeState = stringTimes[i];
+                remoteViews.setImageViewResource(R.id.time_button, times[i]);
+            }
+        }
+
+
+
+        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BigWallpaperWidget.class.getName());
+        int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
+        for (int appWidgetID: ids) {
+            appWidgetManager.updateAppWidget(appWidgetID, remoteViews);
+        }
+    }
+
+    private void enableAndDisableChange(Context context){
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.big_wallpaper_widget);
 
@@ -161,6 +190,26 @@ public class BigWallpaperWidget extends AppWidgetProvider {
         }
     }
 
+    public static void enableAndDisableChangeSync(Context context){
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.big_wallpaper_widget);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if (sharedPreferences.getBoolean("feature_status", false)){
+            enableState = TRUE;
+            remoteViews.setInt(R.id.power_button, "setColorFilter", ContextCompat.getColor(context, R.color.active_green));
+        } else {
+            enableState = FALSE;
+            remoteViews.setInt(R.id.power_button, "setColorFilter", ContextCompat.getColor(context, R.color.black));
+        }
+
+        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BigWallpaperWidget.class.getName());
+        int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
+        for (int appWidgetID: ids) {
+            appWidgetManager.updateAppWidget(appWidgetID, remoteViews);
+        }
+    }
+
     private void shuffleChange(Context context){
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.big_wallpaper_widget);
@@ -183,6 +232,26 @@ public class BigWallpaperWidget extends AppWidgetProvider {
         }
 
         ComponentName thisAppWidget = new ComponentName(context.getPackageName(), getClass().getName());
+        int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
+        for (int appWidgetID: ids) {
+            appWidgetManager.updateAppWidget(appWidgetID, remoteViews);
+        }
+    }
+
+    public static void shuffleChangeSync(Context context){
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.big_wallpaper_widget);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if (sharedPreferences.getBoolean("shuffle", false)){
+            enableState = TRUE;
+            remoteViews.setInt(R.id.shuffle_button, "setColorFilter", ContextCompat.getColor(context, R.color.active_green));
+        } else {
+            enableState = FALSE;
+            remoteViews.setInt(R.id.shuffle_button, "setColorFilter", ContextCompat.getColor(context, R.color.black));
+        }
+
+        ComponentName thisAppWidget = new ComponentName(context.getPackageName(), BigWallpaperWidget.class.getName());
         int ids[] = appWidgetManager.getAppWidgetIds(thisAppWidget);
         for (int appWidgetID: ids) {
             appWidgetManager.updateAppWidget(appWidgetID, remoteViews);
