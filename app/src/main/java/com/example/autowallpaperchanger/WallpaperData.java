@@ -12,6 +12,8 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import androidx.preference.ListPreference;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -47,7 +49,6 @@ class WallpaperData {
         shuffle = preferences.getBoolean("shuffle", false);
         Log.d(TAG, "loadData: shuffle :: " + shuffle);
 
-
         Gson gson = new Gson();
         Type type = new TypeToken<List<String>>() {
         }.getType();
@@ -74,7 +75,8 @@ class WallpaperData {
     public void saveData(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(ImageData.IMAGE_DATA, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-
+        ListPreference listPreference = (ListPreference) sharedPreferences.getAll().get("time_interval");
+        listPreference.setValueIndex(0);
         editor.putInt(ImageData.CURRENT_URI, (imageData.getQueueIndex() + 1) % listSize);
         if (shuffle) {
             editor.putInt(LAST_RANDOM, position);
