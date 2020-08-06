@@ -75,8 +75,6 @@ class WallpaperData {
     public void saveData(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(ImageData.IMAGE_DATA, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        ListPreference listPreference = (ListPreference) sharedPreferences.getAll().get("time_interval");
-        listPreference.setValueIndex(0);
         editor.putInt(ImageData.CURRENT_URI, (imageData.getQueueIndex() + 1) % listSize);
         if (shuffle) {
             editor.putInt(LAST_RANDOM, position);
