@@ -108,7 +108,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void equalizeQueuePointer(){
-        imageData.setQueueIndex(viewPager.getCurrentItem());
+        imageData.setQueueIndex((viewPager.getCurrentItem() + 1) % imageData.getUriList().size());
     }
 
     private void deleteImage() {
