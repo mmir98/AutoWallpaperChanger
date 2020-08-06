@@ -20,7 +20,7 @@
         <ListPreference
             app:title="@string/time_interval_title"
             app:dependency="feature_status"
-            app:defaultValue="1000 * 60 * 30"
+            app:defaultValue="1000*60*30"
             app:entries="@array/time_interval_entries"
             app:entryValues="@array/time_interval_values"
             app:key="time_interval"

@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/widget_background"
+    android:padding="10dp"
+    android:layout_marginBottom="15dp"
+    android:layout_marginTop="15dp"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+
+
+    <ImageView
+        android:id="@+id/small_widget_next_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_widget_next"/>
+
+
+</LinearLayout>

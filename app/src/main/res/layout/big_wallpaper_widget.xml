@@ -19,7 +19,8 @@
             android:id="@+id/power_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_widget_power" />
+            android:src="@drawable/ic_widget_power"
+            android:tint="@color/black"/>
     </LinearLayout>
 
     <LinearLayout

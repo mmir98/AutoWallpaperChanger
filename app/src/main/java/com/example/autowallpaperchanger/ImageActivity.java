@@ -79,7 +79,7 @@ public class ImageActivity extends AppCompatActivity implements View.OnClickList
                 pd.show();
                 setWallpaperThread();
                 equalizeQueuePointer();
-                Toast.makeText(getApplicationContext(), "Wallpaper Changed", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ImageActivity.this, "Wallpaper will change soon", Toast.LENGTH_SHORT).show();
             }
         }
     }

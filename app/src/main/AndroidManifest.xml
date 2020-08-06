@@ -13,12 +13,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <receiver android:name=".SmallWallpaperWidget"
+            android:label="Next widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/small_wallpaper_widget_info" />
+        </receiver>
+
         <activity
             android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity"/>
 
-        <receiver android:name=".wallpaperWidget">
+        <receiver android:name=".BigWallpaperWidget"
+            android:label="Full widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
